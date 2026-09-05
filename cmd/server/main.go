@@ -49,25 +49,25 @@ func main() {
 
 	publicDeps := httpapi.Dependencies{
 		Invoices: invoices,
-		PIX: generator,
-		Status: status,
+		PIX:      generator,
+		Status:   status,
 		Webhooks: webhooks,
-		SiteURL: cfg.SiteURL,
+		SiteURL:  cfg.SiteURL,
 		LightDir: "Light",
 	}
 	handler := httpapi.NewFull(httpapi.FullDependencies{
 		Public: publicDeps,
-		Auth: authService,
-		Admin: adminService,
+		Auth:   authService,
+		Admin:  adminService,
 	}, logger)
 
 	server := &http.Server{
-		Addr: cfg.Addr,
-		Handler: handler,
+		Addr:              cfg.Addr,
+		Handler:           handler,
 		ReadHeaderTimeout: 5 * time.Second,
-		ReadTimeout: 15 * time.Second,
-		WriteTimeout: 35 * time.Second,
-		IdleTimeout: 90 * time.Second,
+		ReadTimeout:       15 * time.Second,
+		WriteTimeout:      35 * time.Second,
+		IdleTimeout:       90 * time.Second,
 	}
 
 	done := make(chan os.Signal, 1)

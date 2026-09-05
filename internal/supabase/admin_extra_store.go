@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/url"
 
-	"github.com/matspectrum-ai/Claro-Fatura/internal/admin"
+	"github.com/matspectrum-ai/Light-Fatura/internal/admin"
 )
 
 func (c *Client) ClearMetrics(ctx context.Context) error {

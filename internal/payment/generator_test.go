@@ -6,20 +6,22 @@ import (
 )
 
 type generatorStoreFake struct {
-	invoice        InvoiceForPayment
-	invoiceFound   bool
-	customer       CustomerForPayment
-	newPerAccess   bool
-	pending        *Transaction
-	expiredID      string
-	syncedCents    int
-	paymentValue   float64
+	invoice      InvoiceForPayment
+	invoiceFound bool
+	customer     CustomerForPayment
+	newPerAccess bool
+	pending      *Transaction
+	expiredID    string
+	syncedCents  int
+	paymentValue float64
 }
 
 func (s *generatorStoreFake) PaymentInvoice(context.Context, string) (InvoiceForPayment, bool, error) {
 	return s.invoice, s.invoiceFound, nil
 }
-func (s *generatorStoreFake) NewPIXPerAccess(context.Context) (bool, error) { return s.newPerAccess, nil }
+func (s *generatorStoreFake) NewPIXPerAccess(context.Context) (bool, error) {
+	return s.newPerAccess, nil
+}
 func (s *generatorStoreFake) LatestPendingTransaction(context.Context, string) (*Transaction, error) {
 	return s.pending, nil
 }
@@ -54,8 +56,8 @@ func TestGeneratorChargesDatabaseDiscountValueExactly(t *testing.T) {
 	gatewayID := "gw-123"
 	store := &generatorStoreFake{
 		invoiceFound: true,
-		invoice: InvoiceForPayment{ID: "invoice-1", CustomerID: "customer-1", Description: "Fatura Light", DiscountAmount: 70.01, Status: "em_aberto"},
-		customer: CustomerForPayment{Name: "Cliente", Phone: "21999999999"},
+		invoice:      InvoiceForPayment{ID: "invoice-1", CustomerID: "customer-1", Description: "Fatura Light", DiscountAmount: 70.01, Status: "em_aberto"},
+		customer:     CustomerForPayment{Name: "Cliente", Phone: "21999999999"},
 		newPerAccess: true,
 	}
 	creator := &creatorFake{tx: &Transaction{ID: "tx-1", GatewaySlug: "cashinpay", GatewayTransactionID: &gatewayID, AmountCents: 7001, CopyPaste: &copyPaste, Status: "pendente"}}

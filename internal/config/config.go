@@ -9,22 +9,22 @@ import (
 )
 
 type Config struct {
-	Addr                     string
-	SiteURL                  string
-	SupabaseURL               string
-	SupabaseServiceRoleKey    string
-	SupabasePublishableKey    string
-	ProductName              string
-	PIXExpiration            time.Duration
-	CashinPaySecretKey       string
-	CashinPayWebhookSecret   string
-	BlackCatAPIKey           string
-	BlackCatPKLive           string
-	PixzyToken               string
-	UmbrellaAPIKey           string
-	PIXKey                   string
-	PIXReceiver              string
-	PIXCity                  string
+	Addr                   string
+	SiteURL                string
+	SupabaseURL            string
+	SupabaseServiceRoleKey string
+	SupabasePublishableKey string
+	ProductName            string
+	PIXExpiration          time.Duration
+	CashinPaySecretKey     string
+	CashinPayWebhookSecret string
+	BlackCatAPIKey         string
+	BlackCatPKLive         string
+	PixzyToken             string
+	UmbrellaAPIKey         string
+	PIXKey                 string
+	PIXReceiver            string
+	PIXCity                string
 }
 
 func Load() (Config, error) {
@@ -39,10 +39,10 @@ func Load() (Config, error) {
 	cfg := Config{
 		Addr:                   valueOr(os.Getenv("ADDR"), ":8080"),
 		SiteURL:                strings.TrimRight(strings.TrimSpace(os.Getenv("SITE_URL")), "/"),
-		SupabaseURL:             strings.TrimRight(strings.TrimSpace(os.Getenv("SUPABASE_URL")), "/"),
-		SupabaseServiceRoleKey:  strings.TrimSpace(os.Getenv("SUPABASE_SERVICE_ROLE_KEY")),
-		SupabasePublishableKey:  strings.TrimSpace(os.Getenv("SUPABASE_PUBLISHABLE_KEY")),
-		ProductName:             valueOr(os.Getenv("PRODUTO_NOME"), "Fatura Light"),
+		SupabaseURL:            strings.TrimRight(strings.TrimSpace(os.Getenv("SUPABASE_URL")), "/"),
+		SupabaseServiceRoleKey: strings.TrimSpace(os.Getenv("SUPABASE_SERVICE_ROLE_KEY")),
+		SupabasePublishableKey: strings.TrimSpace(os.Getenv("SUPABASE_PUBLISHABLE_KEY")),
+		ProductName:            valueOr(os.Getenv("PRODUTO_NOME"), "Fatura Light"),
 		PIXExpiration:          time.Duration(minutes) * time.Minute,
 		CashinPaySecretKey:     strings.TrimSpace(os.Getenv("CASHINPAY_SECRET_KEY")),
 		CashinPayWebhookSecret: strings.TrimSpace(os.Getenv("CASHINPAY_WEBHOOK_SECRET")),

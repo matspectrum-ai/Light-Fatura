@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/url"
 
-	"github.com/matspectrum-ai/Claro-Fatura/internal/payment"
+	"github.com/matspectrum-ai/Light-Fatura/internal/payment"
 )
 
 func (c *Client) LatestInvoiceTransaction(ctx context.Context, invoiceID string) (*payment.ConfirmationTransaction, error) {
@@ -13,6 +13,8 @@ func (c *Client) LatestInvoiceTransaction(ctx context.Context, invoiceID string)
 		"order":     {"created_at.desc"},
 		"limit":     {"1"},
 	})
-	if err != nil || !found { return nil, err }
+	if err != nil || !found {
+		return nil, err
+	}
 	return &tx, nil
 }

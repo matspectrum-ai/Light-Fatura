@@ -12,7 +12,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/matspectrum-ai/Claro-Fatura/internal/admin"
+	"github.com/matspectrum-ai/Light-Fatura/internal/admin"
 )
 
 func (s *FullServer) requireAdmin(w http.ResponseWriter, r *http.Request) bool {
@@ -310,28 +310,28 @@ func (s *FullServer) adminImportCSV(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		metadata := map[string]string{
-			"cte":           get("cte"),
-			"instalacao":    get("instalacao", "instalação"),
-			"endereco":      get("endereco", "endereço"),
-			"endereco_rua":  get("endereco_rua", "rua"),
-			"bairro":        get("bairro"),
-			"cidade":        get("cidade"),
-			"estado":        get("estado", "uf"),
-			"cep":           get("cep"),
-			"contrato":      get("contrato"),
+			"cte":            get("cte"),
+			"instalacao":     get("instalacao", "instalação"),
+			"endereco":       get("endereco", "endereço"),
+			"endereco_rua":   get("endereco_rua", "rua"),
+			"bairro":         get("bairro"),
+			"cidade":         get("cidade"),
+			"estado":         get("estado", "uf"),
+			"cep":            get("cep"),
+			"contrato":       get("contrato"),
 			"conta_contrato": get("conta_contrato", "conta contrato"),
-			"mes_ref":       get("mes_ref", "mes referencia", "mês referência"),
-			"parcneg":       get("parcneg", "parcela"),
+			"mes_ref":        get("mes_ref", "mes referencia", "mês referência"),
+			"parcneg":        get("parcneg", "parcela"),
 		}
 		rows = append(rows, admin.ImportRow{
 			Document: get("documento", "cpf", "codigo", "código"),
-			Name: get("nome", "cliente", "nome_cliente"),
-			Phone: get("telefone", "celular"),
-			Email: get("email", "e-mail"),
+			Name:     get("nome", "cliente", "nome_cliente"),
+			Phone:    get("telefone", "celular"),
+			Email:    get("email", "e-mail"),
 			Original: original,
 			Discount: discount,
-			DueDate: normalizeDate(get("vencimento", "data_vencimento", "vence")),
-			Status: normalizeStatus(get("status")),
+			DueDate:  normalizeDate(get("vencimento", "data_vencimento", "vence")),
+			Status:   normalizeStatus(get("status")),
 			Metadata: metadata,
 		})
 	}

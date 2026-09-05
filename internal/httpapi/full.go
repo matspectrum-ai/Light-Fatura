@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/matspectrum-ai/Claro-Fatura/internal/admin"
+	"github.com/matspectrum-ai/Light-Fatura/internal/admin"
 )
 
 type FullDependencies struct {
@@ -23,11 +23,11 @@ type FullServer struct {
 
 func NewFull(deps FullDependencies, logger *slog.Logger) http.Handler {
 	s := &FullServer{
-		base: New(deps.Public, logger),
-		auth: deps.Auth,
-		admin: deps.Admin,
+		base:    New(deps.Public, logger),
+		auth:    deps.Auth,
+		admin:   deps.Admin,
 		siteURL: deps.Public.SiteURL,
-		logger: logger,
+		logger:  logger,
 	}
 	mux := http.NewServeMux()
 

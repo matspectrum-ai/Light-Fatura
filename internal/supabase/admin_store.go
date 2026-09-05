@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/matspectrum-ai/Claro-Fatura/internal/admin"
+	"github.com/matspectrum-ai/Light-Fatura/internal/admin"
 )
 
 func (c *Client) Dashboard(ctx context.Context) (admin.Dashboard, error) {
@@ -248,7 +248,7 @@ func (c *Client) Payments(ctx context.Context) ([]admin.Payment, error) {
 	var rows []admin.Payment
 	err := c.Select(ctx, "pagamentos", url.Values{
 		"select": {"id,fatura_id,cliente_id,valor,metodo,status,gateway,gateway_payment_id,pago_em,created_at"},
-		"order": {"created_at.desc"}, "limit": {"500"},
+		"order":  {"created_at.desc"}, "limit": {"500"},
 	}, &rows)
 	return rows, err
 }
@@ -256,7 +256,7 @@ func (c *Client) Transactions(ctx context.Context) ([]admin.Transaction, error) 
 	var rows []admin.Transaction
 	err := c.Select(ctx, "transacoes_pix", url.Values{
 		"select": {"id,fatura_id,cliente_id,gateway_slug,transacao_gateway_id,valor_centavos,valor_pago_centavos,status,created_at"},
-		"order": {"created_at.desc"}, "limit": {"500"},
+		"order":  {"created_at.desc"}, "limit": {"500"},
 	}, &rows)
 	return rows, err
 }
@@ -264,7 +264,7 @@ func (c *Client) Logs(ctx context.Context) ([]admin.Log, error) {
 	var rows []admin.Log
 	err := c.Select(ctx, "pagamentos_log", url.Values{
 		"select": {"id,gateway_slug,fatura_id,nivel,http_status,mensagem,created_at"},
-		"order": {"created_at.desc"}, "limit": {"1000"},
+		"order":  {"created_at.desc"}, "limit": {"1000"},
 	}, &rows)
 	return rows, err
 }
@@ -272,7 +272,7 @@ func (c *Client) Gateways(ctx context.Context) ([]admin.Gateway, error) {
 	var rows []admin.Gateway
 	if err := c.Select(ctx, "gateways_config", url.Values{
 		"select": {"id,slug,rotulo,adapter,ativo,prioridade,api_url,ambiente,limite_diario,webhook_url,secret_names,observacoes"},
-		"order": {"prioridade.asc"},
+		"order":  {"prioridade.asc"},
 	}, &rows); err != nil {
 		return nil, err
 	}

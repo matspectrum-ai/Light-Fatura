@@ -25,10 +25,10 @@ func TestDetectDelimiter(t *testing.T) {
 func TestNormalizeHeader(t *testing.T) {
 	tests := map[string]string{
 		"\ufeffCPF":          "cpf",
-		"Mês Referência":    "mes_referencia",
-		"Conta Contrato":    "conta_contrato",
+		"Mês Referência":     "mes_referencia",
+		"Conta Contrato":     "conta_contrato",
 		"VALOR COM DESCONTO": "valor_com_desconto",
-		"Instalação":        "instalacao",
+		"Instalação":         "instalacao",
 	}
 	for input, want := range tests {
 		if got := normalizeHeader(input); got != want {

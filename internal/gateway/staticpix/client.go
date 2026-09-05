@@ -25,7 +25,7 @@ func New(key, receiver, city string) *Client {
 	return &Client{key: key, receiver: receiver, city: city}
 }
 
-func (c *Client) Name() string { return "pix-estatico" }
+func (c *Client) Name() string                   { return "pix-estatico" }
 func (c *Client) Configured(gateway.Record) bool { return strings.TrimSpace(c.key) != "" }
 func (c *Client) CreatePIX(_ context.Context, in gateway.CreateInput) (gateway.CreatedPIX, error) {
 	if !c.Configured(in.Gateway) {

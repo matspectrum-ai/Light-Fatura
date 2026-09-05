@@ -63,7 +63,7 @@ func TestQueryByDocumentMissingCustomerLogsFailedAccess(t *testing.T) {
 func TestQueryByDocumentCustomerWithoutOpenInvoice(t *testing.T) {
 	store := &fakeStore{
 		customerFound: true,
-		customer: Customer{ID: "internal-customer-id", Document: "12345678901", Name: "Cliente Light"},
+		customer:      Customer{ID: "internal-customer-id", Document: "12345678901", Name: "Cliente Light"},
 	}
 	result, err := New(store).QueryByDocument(context.Background(), "12345678901")
 	if err != nil {
@@ -90,7 +90,7 @@ func TestQueryByDocumentMapsLightMetadataAndHidesInternalCustomerID(t *testing.T
 			Observacoes: `{"cte":"CTE123","instalacao":"9988","endereco":"Rua A, 10","endereco_rua":"Rua A","bairro":"Centro","cidade":"Rio de Janeiro","estado":"RJ","cep":"20000-000","contrato":"CTR1","conta_contrato":"CC1","mes_ref":"09/2026","parcneg":"1/3"}`,
 		},
 		invoice: Invoice{ID: "invoice-id", CustomerID: "internal-customer-id", OriginalValue: 100, DiscountedValue: 70, DueDate: "2026-09-10", Status: "em_aberto"},
-		logErr: errors.New("log failure must not break lookup"),
+		logErr:  errors.New("log failure must not break lookup"),
 	}
 	result, err := New(store).QueryByDocument(context.Background(), "12345678901")
 	if err != nil {
