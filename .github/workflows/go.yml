@@ -21,6 +21,13 @@ jobs:
         with:
           go-version: '1.23.x'
           cache: false
+      - name: Module identity
+        run: |
+          grep -qx 'module github.com/matspectrum-ai/Light-Fatura' go.mod
+          if grep -RIn --include='*.go' 'github.com/matspectrum-ai/Claro-Fatura' cmd internal; then
+            echo 'Import legado do Claro-Fatura encontrado.' >&2
+            exit 1
+          fi
       - name: Format workspace
         run: gofmt -w cmd internal
       - name: Test
