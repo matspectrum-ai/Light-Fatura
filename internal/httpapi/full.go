@@ -38,6 +38,7 @@ func NewFull(deps FullDependencies, logger *slog.Logger) http.Handler {
 	mux.HandleFunc("GET /api/auth/me",s.authMe)
 	mux.HandleFunc("POST /api/auth/logout",s.logout)
 	mux.HandleFunc("POST /api/auth/recover",s.recoverPassword)
+	mux.HandleFunc("POST /api/auth/recovery-session",s.recoverySession)
 	mux.HandleFunc("POST /api/auth/password",s.updatePassword)
 	mux.HandleFunc("GET /api/admin/metricas",s.adminMetrics)
 	mux.HandleFunc("GET /api/admin/faturas",s.adminInvoices)
