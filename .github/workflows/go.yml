@@ -35,5 +35,21 @@ jobs:
         run: |
           test -s Light/index.html
           test -s Light/pagamento.html
+          test -s Light/auth.html
+          test -s Light/admin.html
           test -s Light/assets/logolight.svg
           test -s Light/assets/hero-char.png
+          test -s Light/assets/admin.css
+          test -s Light/assets/admin-light.js
+          test -s Light/assets/auth-admin.js
+          test ! -e Light/static/index/12.json
+      - name: Validate deployment scripts
+        run: bash -n scripts/build.sh deploy/bootstrap-vps.sh deploy/release.sh deploy/rollback.sh
+      - name: Build production bundle
+        run: |
+          bash scripts/build.sh /tmp/light-fatura-bundle
+          test -x /tmp/light-fatura-bundle/light-fatura
+          test -s /tmp/light-fatura-bundle/Light/index.html
+          test -s /tmp/light-fatura-bundle/Light/admin.html
+          test -s /tmp/light-fatura-bundle/Light/assets/logolight.svg
+          test ! -e /tmp/light-fatura-bundle/Light/static/index
