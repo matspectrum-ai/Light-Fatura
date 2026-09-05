@@ -1,0 +1,53 @@
+name: One-shot module rename
+
+on:
+  push:
+    branches:
+      - refactor/go-admin-supabase
+    paths:
+      - '.module-rename-trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  rename:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refactor/go-admin-supabase
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.x'
+          cache: false
+      - name: Rename module imports and format Go source
+        run: |
+          set -euo pipefail
+          grep -RIl --include='*.go' 'github.com/matspectrum-ai/Claro-Fatura' cmd internal | while read -r file; do
+            sed -i 's#github.com/matspectrum-ai/Claro-Fatura#github.com/matspectrum-ai/Light-Fatura#g' "$file"
+          done
+          sed -i 's#^module github.com/matspectrum-ai/Claro-Fatura$#module github.com/matspectrum-ai/Light-Fatura#' go.mod
+          gofmt -w cmd internal
+      - name: Verify rename
+        run: |
+          set -euo pipefail
+          if grep -RIn --include='*.go' 'github.com/matspectrum-ai/Claro-Fatura' cmd internal; then
+            echo 'Imports antigos ainda encontrados.' >&2
+            exit 1
+          fi
+          grep -qx 'module github.com/matspectrum-ai/Light-Fatura' go.mod
+          go test ./...
+          go vet ./...
+      - name: Commit rename
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add go.mod cmd internal
+          if git diff --cached --quiet; then
+            echo 'Nenhuma alteração restante.'
+            exit 0
+          fi
+          git commit -m 'refactor: rename Go module imports to Light Fatura'
+          git push origin HEAD:refactor/go-admin-supabase
