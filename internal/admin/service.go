@@ -36,6 +36,7 @@ type Invoice struct {
 	Status      string  `json:"status"`
 	Client      Client  `json:"cliente"`
 }
+
 type InvoicePage struct {
 	Rows  []Invoice `json:"linhas"`
 	Total int       `json:"total"`
@@ -52,6 +53,7 @@ type ImportRow struct {
 	Status   string
 	Metadata map[string]string
 }
+
 type ImportResult struct {
 	Imported        int      `json:"importados"`
 	InvoicesCreated int      `json:"faturasCriadas"`
@@ -71,6 +73,7 @@ type Payment struct {
 	PaidAt           *string `json:"pago_em"`
 	CreatedAt        string  `json:"created_at"`
 }
+
 type Transaction struct {
 	ID                   string  `json:"id"`
 	InvoiceID            string  `json:"fatura_id"`
@@ -82,6 +85,7 @@ type Transaction struct {
 	Status               string  `json:"status"`
 	CreatedAt            string  `json:"created_at"`
 }
+
 type Log struct {
 	ID          string  `json:"id"`
 	GatewaySlug string  `json:"gateway_slug"`
@@ -107,14 +111,24 @@ type Gateway struct {
 	Observations *string  `json:"observacoes"`
 	Configured   bool     `json:"configurado"`
 }
+
 type Routing struct {
 	Strategy        string  `json:"estrategia"`
 	FixedGateway    *string `json:"gateway_fixa"`
 	NewPIXPerAccess bool    `json:"novo_pix_por_acesso"`
 }
 
+type WebhookSummary struct {
+	GatewaySlug string  `json:"gateway_slug"`
+	Total       int     `json:"total"`
+	Valid       int     `json:"validos"`
+	Invalid     int     `json:"invalidos"`
+	LastAt      *string `json:"ultimo_em"`
+}
+
 type Store interface {
 	Dashboard(context.Context) (Dashboard, error)
+	ClearMetrics(context.Context) error
 	ListInvoices(context.Context, string, int, int) (InvoicePage, error)
 	SaveInvoice(context.Context, Invoice) error
 	SetInvoiceStatus(context.Context, string, string) error
@@ -124,25 +138,34 @@ type Store interface {
 	Transactions(context.Context) ([]Transaction, error)
 	Logs(context.Context) ([]Log, error)
 	Gateways(context.Context) ([]Gateway, error)
+	CreateGateway(context.Context, Gateway) error
 	SaveGateway(context.Context, Gateway) error
 	DeleteGateway(context.Context, string) error
 	UseOnlyGateway(context.Context, string) error
 	AdminRouting(context.Context) (Routing, error)
 	SaveRouting(context.Context, Routing) error
+	WebhookSummaries(context.Context) ([]WebhookSummary, error)
 }
 
 type Service struct{ store Store }
 
 func New(store Store) *Service { return &Service{store: store} }
+
 func (s *Service) Dashboard(ctx context.Context) (Dashboard, error) {
 	return s.store.Dashboard(ctx)
 }
+
+func (s *Service) ClearMetrics(ctx context.Context) error {
+	return s.store.ClearMetrics(ctx)
+}
+
 func (s *Service) ListInvoices(ctx context.Context, search string, page int) (InvoicePage, error) {
 	if page < 0 {
 		page = 0
 	}
 	return s.store.ListInvoices(ctx, strings.TrimSpace(search), page, 50)
 }
+
 func (s *Service) SaveInvoice(ctx context.Context, in Invoice) error {
 	in.DocumentDigits()
 	if in.ID == "" || in.ClientID == "" || len(in.Client.Document) != 11 || strings.TrimSpace(in.Client.Name) == "" || !dateOnly(in.DueDate) || in.Original < 0 || in.Discount < 0 || !statusAllowed(in.Status) {
@@ -150,20 +173,23 @@ func (s *Service) SaveInvoice(ctx context.Context, in Invoice) error {
 	}
 	return s.store.SaveInvoice(ctx, in)
 }
+
 func (s *Service) SetInvoiceStatus(ctx context.Context, id, status string) error {
 	if id == "" || !statusAllowed(status) {
 		return ErrInvalid
 	}
 	return s.store.SetInvoiceStatus(ctx, id, status)
 }
+
 func (s *Service) DeleteAll(ctx context.Context, confirmation string) error {
 	if confirmation != "APAGAR" {
 		return ErrInvalid
 	}
 	return s.store.DeleteAll(ctx)
 }
+
 func (s *Service) Import(ctx context.Context, rows []ImportRow) (ImportResult, error) {
-	if len(rows) == 0 || len(rows) > 5000 {
+	if len(rows) == 0 || len(rows) > 50000 {
 		return ImportResult{}, ErrInvalid
 	}
 	seen := map[string]struct{}{}
@@ -207,46 +233,81 @@ func (s *Service) Import(ctx context.Context, rows []ImportRow) (ImportResult, e
 	saved.Rejected = append(result.Rejected, saved.Rejected...)
 	return saved, nil
 }
+
 func (s *Service) Payments(ctx context.Context) ([]Payment, error) {
 	return s.store.Payments(ctx)
 }
+
 func (s *Service) Transactions(ctx context.Context) ([]Transaction, error) {
 	return s.store.Transactions(ctx)
 }
-func (s *Service) Logs(ctx context.Context) ([]Log, error) { return s.store.Logs(ctx) }
+
+func (s *Service) Logs(ctx context.Context) ([]Log, error) {
+	return s.store.Logs(ctx)
+}
+
 func (s *Service) Gateways(ctx context.Context) ([]Gateway, error) {
 	return s.store.Gateways(ctx)
 }
+
+func (s *Service) CreateGateway(ctx context.Context, g Gateway) error {
+	g.Slug = strings.ToLower(strings.TrimSpace(g.Slug))
+	g.Label = strings.TrimSpace(g.Label)
+	g.Adapter = strings.TrimSpace(g.Adapter)
+	if g.Environment == "" {
+		g.Environment = "producao"
+	}
+	if g.Priority < 1 || g.Label == "" || g.Adapter == "" || !validSlug(g.Slug) {
+		return ErrInvalid
+	}
+	return s.store.CreateGateway(ctx, g)
+}
+
 func (s *Service) SaveGateway(ctx context.Context, g Gateway) error {
-	if g.ID == "" || g.Slug == "" || g.Label == "" || g.Priority < 1 {
+	g.Slug = strings.ToLower(strings.TrimSpace(g.Slug))
+	g.Label = strings.TrimSpace(g.Label)
+	g.Adapter = strings.TrimSpace(g.Adapter)
+	if g.ID == "" || g.Priority < 1 || g.Label == "" || g.Adapter == "" || !validSlug(g.Slug) {
 		return ErrInvalid
 	}
 	return s.store.SaveGateway(ctx, g)
 }
+
 func (s *Service) DeleteGateway(ctx context.Context, id string) error {
 	if id == "" {
 		return ErrInvalid
 	}
 	return s.store.DeleteGateway(ctx, id)
 }
+
 func (s *Service) UseOnlyGateway(ctx context.Context, id string) error {
 	if id == "" {
 		return ErrInvalid
 	}
 	return s.store.UseOnlyGateway(ctx, id)
 }
+
 func (s *Service) Routing(ctx context.Context) (Routing, error) {
 	return s.store.AdminRouting(ctx)
 }
+
 func (s *Service) SaveRouting(ctx context.Context, r Routing) error {
 	if r.Strategy != "prioridade" && r.Strategy != "rodizio" && r.Strategy != "fixa" {
 		return ErrInvalid
 	}
-	if r.Strategy == "fixa" && r.FixedGateway == nil {
+	if r.Strategy == "fixa" && (r.FixedGateway == nil || strings.TrimSpace(*r.FixedGateway) == "") {
 		return ErrInvalid
+	}
+	if r.Strategy != "fixa" {
+		r.FixedGateway = nil
 	}
 	return s.store.SaveRouting(ctx, r)
 }
+
+func (s *Service) WebhookSummaries(ctx context.Context) ([]WebhookSummary, error) {
+	return s.store.WebhookSummaries(ctx)
+}
+
 func (i *Invoice) DocumentDigits() {
 	i.Client.Document = digits(i.Client.Document)
 	if i.Client.Phone != nil {
@@ -254,6 +315,7 @@ func (i *Invoice) DocumentDigits() {
 		i.Client.Phone = &v
 	}
 }
+
 func digits(v string) string {
 	var b strings.Builder
 	for _, r := range v {
@@ -263,6 +325,20 @@ func digits(v string) string {
 	}
 	return b.String()
 }
+
+func validSlug(v string) bool {
+	if v == "" {
+		return false
+	}
+	for _, r := range v {
+		if (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') || r == '-' || r == '_' {
+			continue
+		}
+		return false
+	}
+	return true
+}
+
 func dateOnly(v string) bool {
 	if len(v) != 10 || v[4] != '-' || v[7] != '-' {
 		return false
@@ -277,6 +353,7 @@ func dateOnly(v string) bool {
 	}
 	return true
 }
+
 func statusAllowed(v string) bool {
 	switch v {
 	case "em_aberto", "vencida", "em_processamento", "paga", "expirada", "falhou", "cancelada":
