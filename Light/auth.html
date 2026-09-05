@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Admin — Light Fatura</title>
+  <link rel="stylesheet" href="/assets/admin.css">
+  <script defer src="/assets/auth-admin.js"></script>
+</head>
+<body class="auth-page">
+  <main class="auth-shell">
+    <a class="auth-brand" href="/"><img src="/assets/logolight.svg" alt="Light"></a>
+    <section class="auth-card" id="login-card">
+      <div class="auth-badge">Área administrativa</div>
+      <h1>Acesse o painel</h1>
+      <p>Entre com o usuário administrador cadastrado no Supabase.</p>
+      <form id="login-form">
+        <label>E-mail<input name="email" type="email" autocomplete="username" required></label>
+        <label>Senha<input name="senha" type="password" autocomplete="current-password" required></label>
+        <button type="submit">Entrar</button>
+      </form>
+      <button class="link-button" id="forgot-link" type="button">Esqueci minha senha</button>
+      <p class="form-message" id="login-message" hidden></p>
+    </section>
+    <section class="auth-card" id="forgot-card" hidden>
+      <div class="auth-badge">Recuperar acesso</div><h1>Redefinir senha</h1><p>Informe o e-mail do administrador.</p>
+      <form id="forgot-form"><label>E-mail<input name="email" type="email" required></label><button type="submit">Enviar recuperação</button></form>
+      <button class="link-button back-login" type="button">Voltar</button><p class="form-message" id="forgot-message" hidden></p>
+    </section>
+    <section class="auth-card" id="reset-card" hidden>
+      <div class="auth-badge">Nova senha</div><h1>Defina sua senha</h1><p>Digite uma nova senha com pelo menos 6 caracteres.</p>
+      <form id="reset-form"><label>Nova senha<input name="senha" type="password" minlength="6" required></label><button type="submit">Atualizar senha</button></form>
+      <p class="form-message" id="reset-message" hidden></p>
+    </section>
+    <a class="back-site" href="/">Voltar para o portal</a>
+  </main>
+</body>
+</html>

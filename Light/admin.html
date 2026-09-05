@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
+  <title>Painel administrativo — Light Fatura</title>
+  <link rel="stylesheet" href="/assets/admin.css"><script defer src="/assets/admin-light.js"></script>
+</head>
+<body class="admin-body">
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><img src="/assets/logolight.svg" alt="Light"></div>
+    <nav class="nav" id="nav">
+      <button data-view="dashboard" class="active">Dashboard</button>
+      <button data-view="faturas">Clientes e Faturas</button>
+      <button data-view="pagamentos">Pagamentos</button>
+      <button data-view="transacoes">Transações PIX</button>
+      <button data-view="gateways">Gateways</button>
+      <button data-view="logs">Logs</button>
+    </nav>
+    <div class="sidebar-footer"><button id="logout">Sair</button></div>
+  </aside>
+  <section class="main">
+    <header class="top"><div><h1 id="page-title">Dashboard</h1><small>Light Fatura</small></div><small id="admin-email"></small></header>
+    <main class="content">
+      <section class="view" id="view-dashboard">
+        <div class="metrics">
+          <article class="metric"><span>Clientes</span><strong id="m-clients">—</strong></article>
+          <article class="metric"><span>Faturas</span><strong id="m-invoices">—</strong></article>
+          <article class="metric"><span>Pagamentos confirmados</span><strong id="m-payments">—</strong></article>
+          <article class="metric"><span>Consultas encontradas</span><strong id="m-views">—</strong></article>
+        </div>
+        <div class="panel" style="margin-top:16px"><div class="panel-header"><h2>Valor consultado</h2><button class="button small" id="clear-metrics-btn">Limpar histórico</button></div><div style="padding:24px"><strong id="m-value" style="font-size:30px">—</strong><p class="muted">Soma do valor com desconto nas consultas encontradas.</p></div></div>
+      </section>
+      <section class="view" id="view-faturas" hidden>
+        <div class="toolbar"><div class="toolbar-left"><input class="search" id="invoice-search" placeholder="Buscar por CPF, nome ou telefone"><button class="button" id="invoice-search-btn">Buscar</button></div><div class="toolbar-right"><button class="button primary" id="import-btn">Importar CSV</button><button class="button danger" id="delete-all-btn">Apagar base</button></div></div>
+        <div class="panel"><div class="panel-header"><h2>Clientes e Faturas</h2><span class="muted" id="invoice-total"></span></div><div class="table-wrap"><table class="table"><thead><tr><th>CPF</th><th>Cliente</th><th>Vencimento</th><th>Original</th><th>Com desconto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="invoice-body"></tbody></table></div><div class="pager"><button class="button small" id="prev-page">Anterior</button><span class="muted" id="page-label"></span><button class="button small" id="next-page">Próxima</button></div></div>
+      </section>
+      <section class="view" id="view-pagamentos" hidden><div class="panel"><div class="panel-header"><h2>Pagamentos</h2><button class="button small" data-refresh="pagamentos">Atualizar</button></div><div class="table-wrap"><table class="table"><thead><tr><th>Data</th><th>Fatura</th><th>Valor</th><th>Método</th><th>Gateway</th><th>Status</th></tr></thead><tbody id="payments-body"></tbody></table></div></div></section>
+      <section class="view" id="view-transacoes" hidden><div class="panel"><div class="panel-header"><h2>Transações PIX</h2><button class="button small" data-refresh="transacoes">Atualizar</button></div><div class="table-wrap"><table class="table"><thead><tr><th>Data</th><th>Gateway</th><th>Referência</th><th>Valor</th><th>Pago</th><th>Status</th></tr></thead><tbody id="transactions-body"></tbody></table></div></div></section>
+      <section class="view" id="view-gateways" hidden>
+        <div class="routing"><label>Estratégia<select id="routing-strategy"><option value="prioridade">Prioridade</option><option value="rodizio">Rodízio</option><option value="fixa">Fixa</option></select></label><label>Gateway fixa<select id="routing-fixed"><option value="">Selecione</option></select></label><label>Novo PIX por acesso<select id="routing-new"><option value="false">Não</option><option value="true">Sim</option></select></label></div>
+        <div class="toolbar"><button class="button" id="new-gateway-btn">Adicionar gateway</button><button class="button primary" id="save-routing">Salvar roteamento</button></div><div class="gateway-grid" id="gateway-grid"></div>
+      </section>
+      <section class="view" id="view-logs" hidden><div class="panel"><div class="panel-header"><h2>Logs de pagamento</h2><button class="button small" data-refresh="logs">Atualizar</button></div><div class="table-wrap"><table class="table"><thead><tr><th>Data</th><th>Gateway</th><th>Nível</th><th>HTTP</th><th>Mensagem</th></tr></thead><tbody id="logs-body"></tbody></table></div></div></section>
+    </main>
+  </section>
+</div>
+<dialog id="edit-dialog"><div class="dialog-head"><h3>Editar fatura</h3><button class="button small" data-close>Fechar</button></div><form id="edit-form"><div class="dialog-body"><input type="hidden" name="id"><input type="hidden" name="cliente_id"><div class="dialog-grid"><label>Nome<input name="nome" required></label><label>CPF<input name="documento" maxlength="14" required></label><label>Telefone<input name="telefone"></label><label>E-mail<input name="email" type="email"></label><label>Valor original<input name="valor_original" type="number" step="0.01" required></label><label>Valor com desconto<input name="valor_desconto" type="number" step="0.01" required></label><label>Vencimento<input name="vencimento" type="date" required></label><label>Status<select name="status"><option>em_aberto</option><option>vencida</option><option>em_processamento</option><option>paga</option><option>expirada</option><option>falhou</option><option>cancelada</option></select></label></div><label>Descrição<input name="descricao"></label><label>Referência<input name="referencia"></label></div><div class="dialog-actions"><button class="button" type="button" data-close>Cancelar</button><button class="button primary" type="submit">Salvar</button></div></form></dialog>
+<dialog id="import-dialog"><div class="dialog-head"><h3>Importar clientes e faturas</h3><button class="button small" data-close>Fechar</button></div><form id="import-form"><div class="dialog-body"><p class="muted">O sistema detecta CSV separado por ponto e vírgula, vírgula ou TAB. Campos reconhecidos: CPF/documento, nome, telefone, e-mail, valor_original, valor_desconto (opcional), vencimento, status e dados Light como instalação, CTE, contrato, endereço e mês de referência.</p><input type="file" name="arquivo" accept=".csv,text/csv" required><p class="muted">Se valor_desconto estiver vazio, o sistema aplica automaticamente 30% de desconto, mantendo o comportamento atual do portal Light.</p><p id="import-result" class="form-message" hidden></p></div><div class="dialog-actions"><button class="button" type="button" data-close>Cancelar</button><button class="button primary" type="submit">Importar CSV</button></div></form></dialog>
+<dialog id="gateway-dialog"><div class="dialog-head"><h3 id="gateway-dialog-title">Editar gateway</h3><button class="button small" data-close>Fechar</button></div><form id="gateway-form"><div class="dialog-body"><input type="hidden" name="id"><div class="dialog-grid"><label>Nome<input name="rotulo" required></label><label>Slug<input name="slug" placeholder="minha-gateway" required></label><label>Prioridade<input name="prioridade" type="number" min="1" required></label><label>Adapter<input name="adapter" placeholder="generico" required></label><label>Ambiente<input name="ambiente" value="producao"></label><label>Limite diário<input name="limite_diario" type="number" min="0"></label></div><label>API URL<input name="api_url" placeholder="https://..."></label><label>Webhook URL<input name="webhook_url" placeholder="https://.../api/public/webhooks/slug"></label><label>Secret names <small class="muted">(separados por vírgula)</small><input name="secret_names" placeholder="MINHA_API_KEY,MINHA_WEBHOOK_SECRET"></label><label>Observações<input name="observacoes"></label><label><input name="ativo" type="checkbox"> Gateway ativa</label></div><div class="dialog-actions"><button class="button danger" type="button" id="delete-gateway-btn">Excluir</button><span style="flex:1"></span><button class="button" type="button" data-close>Cancelar</button><button class="button primary" type="submit">Salvar</button></div></form></dialog>
+<div class="toast" id="toast"></div>
+</body></html>

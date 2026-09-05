@@ -1,0 +1,62 @@
+name: Go verification
+
+on:
+  push:
+    branches:
+      - 'refactor/**'
+      - 'fix/**'
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.x'
+          cache: false
+      - name: Module identity
+        run: |
+          grep -qx 'module github.com/matspectrum-ai/Light-Fatura' go.mod
+          if grep -RIn --include='*.go' 'github.com/matspectrum-ai/Claro-Fatura' cmd internal; then
+            echo 'Import legado do Claro-Fatura encontrado.' >&2
+            exit 1
+          fi
+      - name: Format workspace
+        run: gofmt -w cmd internal
+      - name: Test
+        run: go test ./...
+      - name: Race detector
+        run: go test -race ./internal/payment ./internal/gateway/... ./internal/httpapi ./internal/invoice ./internal/supabase
+      - name: Vet
+        run: go vet ./...
+      - name: Build
+        run: CGO_ENABLED=0 go build -trimpath -o /tmp/light-fatura ./cmd/server
+      - name: Static Light assets
+        run: |
+          test -s Light/index.html
+          test -s Light/pagamento.html
+          test -s Light/auth.html
+          test -s Light/admin.html
+          test -s Light/assets/logolight.svg
+          test -s Light/assets/hero-char.png
+          test -s Light/assets/admin.css
+          test -s Light/assets/admin-light.js
+          test -s Light/assets/auth-admin.js
+          test ! -e Light/static/index/12.json
+      - name: Validate deployment scripts
+        run: bash -n scripts/build.sh deploy/bootstrap-vps.sh deploy/release.sh deploy/rollback.sh
+      - name: Build production bundle
+        run: |
+          bash scripts/build.sh /tmp/light-fatura-bundle
+          test -x /tmp/light-fatura-bundle/light-fatura
+          test -s /tmp/light-fatura-bundle/Light/index.html
+          test -s /tmp/light-fatura-bundle/Light/admin.html
+          test -s /tmp/light-fatura-bundle/Light/assets/logolight.svg
+          test ! -e /tmp/light-fatura-bundle/Light/static/index
