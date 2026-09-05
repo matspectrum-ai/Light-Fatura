@@ -1,0 +1,39 @@
+name: Go verification
+
+on:
+  push:
+    branches:
+      - 'refactor/**'
+      - 'fix/**'
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.x'
+          cache: false
+      - name: Go fmt
+        run: test -z "$(gofmt -l cmd internal)"
+      - name: Test
+        run: go test ./...
+      - name: Race detector
+        run: go test -race ./internal/payment ./internal/gateway/... ./internal/httpapi ./internal/invoice ./internal/supabase
+      - name: Vet
+        run: go vet ./...
+      - name: Build
+        run: CGO_ENABLED=0 go build -trimpath -o /tmp/light-fatura ./cmd/server
+      - name: Static Light assets
+        run: |
+          test -s Light/index.html
+          test -s Light/pagamento.html
+          test -s Light/assets/logolight.svg
+          test -s Light/assets/hero-char.png
