@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/matspectrum-ai/Claro-Fatura/internal/gateway"
+	"github.com/matspectrum-ai/Light-Fatura/internal/gateway"
 )
 
 type Client struct { http *http.Client; lookup func(string) string }
