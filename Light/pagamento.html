@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pagamento - Light</title>
+    <link href="assets/google-fonts-inter.css" rel="stylesheet" />
+    <style>
+      body { font-family: Inter, sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
+      .container { max-width: 420px; margin: 0 auto; padding: 24px 16px; }
+      .card { background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+      .title { font-size: 18px; font-weight: 700; color: #111827; margin-bottom: 12px; }
+      .row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; color: #374151; }
+      .row:last-child { border-bottom: none; }
+      .highlight { color: #06a09a; font-weight: 700; }
+      .btn { margin-top: 16px; width: 100%; padding: 14px; border: none; border-radius: 12px; background: linear-gradient(90deg, #009693, #00d4cc); color: #fff; font-weight: 700; font-size: 15px; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <div class="title">Pagamento via PIX</div>
+        <div class="row"><span>Cliente</span><span id="nome">-</span></div>
+        <div class="row"><span>CPF</span><span id="cpf">-</span></div>
+        <div class="row"><span>Contrato</span><span id="contrato">-</span></div>
+        <div class="row"><span>Vencimento</span><span id="vencimento">-</span></div>
+        <div class="row"><span>Valor original</span><span id="original">-</span></div>
+        <div class="row"><span>Desconto</span><span id="desconto">-</span></div>
+        <div class="row"><span>Valor final</span><span class="highlight" id="final">-</span></div>
+        <button class="btn" onclick="alert('QR Code PIX simulado para fatura fake.')">Pagar com PIX</button>
+      </div>
+    </div>
+    <script>
+      (function(){
+        const raw = localStorage.getItem('dadosPagamento');
+        if (!raw) return;
+        const d = JSON.parse(raw);
+        document.getElementById('nome').textContent = d.nome || '-';
+        document.getElementById('cpf').textContent = d.cpf ? d.cpf.replace(/\D/g,'').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4') : '-';
+        document.getElementById('contrato').textContent = d.cte || '-';
+        document.getElementById('vencimento').textContent = '10/10/2026';
+        document.getElementById('original').textContent = 'R$ ' + Number(d.valor_original||0).toFixed(2).replace('.',',');
+        document.getElementById('desconto').textContent = '30%';
+        document.getElementById('final').textContent = 'R$ ' + Number(d.valor||0).toFixed(2).replace('.',',');
+      })();
+    </script>
+  </body>
+</html>
