@@ -14,7 +14,7 @@ func (c *Client) CustomerByDocument(ctx context.Context, document string) (invoi
 	var rows []struct {
 		ID string `json:"id"`; Documento string `json:"documento"`; Nome string `json:"nome"`; Telefone string `json:"telefone"`; Email string `json:"email"`; Observacoes string `json:"observacoes"`
 	}
-	q := "select=id,documento,nome,telefone,email,observacoes&documento=eq." + url.QueryEscape(document) + "&limit=1"
+	q := url.Values{"select":{"id,documento,nome,telefone,email,observacoes"},"documento":{"eq."+document},"limit":{"1"}}
 	if err := c.Select(ctx, "clientes", q, &rows); err != nil { return invoice.Customer{}, false, err }
 	if len(rows) == 0 { return invoice.Customer{}, false, nil }
 	r := rows[0]
@@ -25,7 +25,7 @@ func (c *Client) LatestOpenInvoice(ctx context.Context, customerID string) (invo
 	var rows []struct {
 		ID string `json:"id"`; ClienteID string `json:"cliente_id"`; Descricao string `json:"descricao"`; Referencia string `json:"referencia"`; ValorOriginal float64 `json:"valor_original"`; ValorDesconto float64 `json:"valor_desconto"`; Vencimento string `json:"vencimento"`; Status string `json:"status"`
 	}
-	q := "select=id,cliente_id,descricao,referencia,valor_original,valor_desconto,vencimento,status&cliente_id=eq." + url.QueryEscape(customerID) + "&status=in.(em_aberto,vencida,em_processamento)&order=created_at.desc&limit=1"
+	q := url.Values{"select":{"id,cliente_id,descricao,referencia,valor_original,valor_desconto,vencimento,status"},"cliente_id":{"eq."+customerID},"status":{"in.(em_aberto,vencida,em_processamento)"},"order":{"created_at.desc"},"limit":{"1"}}
 	if err := c.Select(ctx, "faturas", q, &rows); err != nil { return invoice.Invoice{}, false, err }
 	if len(rows) == 0 { return invoice.Invoice{}, false, nil }
 	r := rows[0]
@@ -38,12 +38,11 @@ func (c *Client) LogAccess(ctx context.Context, document string, success bool, o
 
 func (c *Client) IsAdmin(ctx context.Context, userID string) (bool, error) {
 	var rows []struct{ Role string `json:"role"` }
-	q := "select=role&user_id=eq." + url.QueryEscape(userID) + "&role=eq.admin&limit=1"
+	q := url.Values{"select":{"role"},"user_id":{"eq."+userID},"role":{"eq.admin"},"limit":{"1"}}
 	if err := c.Select(ctx, "user_roles", q, &rows); err != nil { return false, err }
 	return len(rows) > 0, nil
 }
 
-// EncodeLightMetadata keeps Light-specific CSV columns in clientes.observacoes without changing the shared schema.
 func EncodeLightMetadata(values map[string]string) string {
 	clean := map[string]string{}
 	for key, value := range values { if strings.TrimSpace(value) != "" { clean[key] = strings.TrimSpace(value) } }
