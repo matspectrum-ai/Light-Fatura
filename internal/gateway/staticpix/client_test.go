@@ -3,7 +3,7 @@ package staticpix
 import (
 	"testing"
 
-	"github.com/matspectrum-ai/Claro-Fatura/internal/gateway"
+	"github.com/matspectrum-ai/Light-Fatura/internal/gateway"
 )
 
 func TestBRCodeCharacterization(t *testing.T) {
