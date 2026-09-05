@@ -15,6 +15,7 @@ import (
 	"github.com/matspectrum-ai/Claro-Fatura/internal/gateway"
 	"github.com/matspectrum-ai/Claro-Fatura/internal/gateway/cashinpay"
 	"github.com/matspectrum-ai/Claro-Fatura/internal/gateway/generic"
+	"github.com/matspectrum-ai/Claro-Fatura/internal/gateway/staticpix"
 	"github.com/matspectrum-ai/Claro-Fatura/internal/httpapi"
 	"github.com/matspectrum-ai/Claro-Fatura/internal/invoice"
 	"github.com/matspectrum-ai/Claro-Fatura/internal/payment"
@@ -34,6 +35,7 @@ func main() {
 	registry := gateway.NewRegistry(
 		fallback,
 		cashinpay.New(cfg.CashinPaySecretKey, cfg.CashinPayWebhookSecret, cfg.ProductName, gateway.DefaultCustomerEmail),
+		staticpix.New(cfg.PIXKey, cfg.PIXReceiver, cfg.PIXCity),
 	)
 
 	creator := payment.NewWithExpiration(store, registry, cfg.ProductName, cfg.PIXExpiration)
