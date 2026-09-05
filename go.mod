@@ -1,3 +1,3 @@
-module github.com/matspectrum-ai/Light-Fatura
+module github.com/matspectrum-ai/Claro-Fatura
 
 go 1.23.0
