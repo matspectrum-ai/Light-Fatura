@@ -1,10 +1,13 @@
 name: Go verification
 
 on:
+  push:
+    branches:
+      - 'refactor/**'
+      - 'fix/**'
   pull_request:
     branches:
       - main
-  workflow_dispatch:
 
 permissions:
   contents: read
