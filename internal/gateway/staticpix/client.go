@@ -10,7 +10,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/matspectrum-ai/Claro-Fatura/internal/gateway"
+	"github.com/matspectrum-ai/Light-Fatura/internal/gateway"
 )
 
 type Client struct{ key, receiver, city string }
