@@ -9,17 +9,17 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/matspectrum-ai/Claro-Fatura/internal/admin"
-	"github.com/matspectrum-ai/Claro-Fatura/internal/auth"
-	"github.com/matspectrum-ai/Claro-Fatura/internal/config"
-	"github.com/matspectrum-ai/Claro-Fatura/internal/gateway"
-	"github.com/matspectrum-ai/Claro-Fatura/internal/gateway/cashinpay"
-	"github.com/matspectrum-ai/Claro-Fatura/internal/gateway/generic"
-	"github.com/matspectrum-ai/Claro-Fatura/internal/gateway/staticpix"
-	"github.com/matspectrum-ai/Claro-Fatura/internal/httpapi"
-	"github.com/matspectrum-ai/Claro-Fatura/internal/invoice"
-	"github.com/matspectrum-ai/Claro-Fatura/internal/payment"
-	"github.com/matspectrum-ai/Claro-Fatura/internal/supabase"
+	"github.com/matspectrum-ai/Light-Fatura/internal/admin"
+	"github.com/matspectrum-ai/Light-Fatura/internal/auth"
+	"github.com/matspectrum-ai/Light-Fatura/internal/config"
+	"github.com/matspectrum-ai/Light-Fatura/internal/gateway"
+	"github.com/matspectrum-ai/Light-Fatura/internal/gateway/cashinpay"
+	"github.com/matspectrum-ai/Light-Fatura/internal/gateway/generic"
+	"github.com/matspectrum-ai/Light-Fatura/internal/gateway/staticpix"
+	"github.com/matspectrum-ai/Light-Fatura/internal/httpapi"
+	"github.com/matspectrum-ai/Light-Fatura/internal/invoice"
+	"github.com/matspectrum-ai/Light-Fatura/internal/payment"
+	"github.com/matspectrum-ai/Light-Fatura/internal/supabase"
 )
 
 func main() {
