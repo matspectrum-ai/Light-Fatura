@@ -1,6 +1,10 @@
 package staticpix
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/matspectrum-ai/Claro-Fatura/internal/gateway"
+)
 
 func TestBRCodeCharacterization(t *testing.T) {
 	got := brCode("11999999999", 12.34, "JOÃO DA SILVA", "SÃO PAULO", "ABC123")
@@ -12,7 +16,7 @@ func TestBRCodeCharacterization(t *testing.T) {
 
 func TestClientRequiresPIXKey(t *testing.T) {
 	client := New("", "LIGHT SERVICOS", "RIO DE JANEIRO")
-	if client.Configured(structGatewayRecord()) {
+	if client.Configured(gateway.Record{}) {
 		t.Fatal("client should not be configured without PIX key")
 	}
 }
